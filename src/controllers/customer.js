@@ -1,4 +1,5 @@
 const { Prisma } = require("@prisma/client")
+const { json } = require("express")
 const prisma = require('../utils/prisma')
 
 const createCustomer = async (req, res) => {
@@ -48,6 +49,34 @@ const createCustomer = async (req, res) => {
     }
 }
 
+const updateCustomer = async (req, res) => {
+    const { name, email, phone } = req.body;
+    const { id } = req.params;
+    try{
+        const updatedCustomer = await prisma.customer.update({
+            data: {
+                name,
+                contact: {
+                    update:{
+                        email,
+                        phone
+                    }
+                }
+            },
+            where: {
+                id: Number.parseInt(id)
+            },
+            include: {
+                contact: true
+            }
+        }) 
+        res.status(201).json({customer: updatedCustomer})
+    } catch (e){
+
+    }
+}
+
 module.exports = {
-    createCustomer
+    createCustomer,
+    updateCustomer
 }
